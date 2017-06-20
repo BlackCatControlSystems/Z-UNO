@@ -1,0 +1,73 @@
+
+#define Button_PIN_1  14 //Button 1
+#define Button_PIN_2   15 //Button 2
+
+#define SWITCH_ON 0xff
+#define SWITCH_OFF 0
+
+#define currentBTN1
+#define currentBTN2
+
+
+//ZUNO_SETUP_DEBUG_MODE(DEBUG_ON);
+
+
+// Global variables to store data reported via getters
+byte LastButton_state1 = 0; //Button Last State
+byte LastButton_state2 = 0; //Button Last State
+
+ZUNO_SETUP_SLEEPING_MODE(ZUNO_SLEEPING_MODE_ALWAYS_AWAKE);
+
+ZUNO_SETUP_ASSOCIATIONS(ZUNO_ASSOCIATION_GROUP_SET_VALUE); // Send Basic Set to association group
+
+
+// Set up 2 channels
+ZUNO_SETUP_CHANNELS(
+  ZUNO_SENSOR_BINARY_GENERAL_PURPOSE(getterBTN1),
+  ZUNO_SENSOR_BINARY_GENERAL_PURPOSE(getterBTN2)
+);
+
+// the setup routine runs once when you press reset:
+void setup() {
+  Serial.begin();
+    
+  Serial.println("Setup");
+  pinMode(Button_PIN_1, INPUT_PULLUP); // Set button pin as input
+  pinMode(Button_PIN_2, INPUT_PULLUP); // Set button pin as input
+  
+}
+// the loop routine runs over and over again forever:
+void loop() {
+  byte currentBTN1_State1;
+  byte currentBTN2_State2;
+
+
+  currentBTN1_State1 = digitalRead(Button_PIN_1); 
+  if (currentBTN1_State1 != LastButton_state1) { 
+    LastButton_state1 = currentBTN1_State1;
+    zunoSendReport(1);
+ }
+ 
+  currentBTN2_State2 = digitalRead(Button_PIN_2); 
+  if (currentBTN2_State2 != LastButton_state2) { 
+    LastButton_state2 = currentBTN2_State2;
+    zunoSendReport(2);
+ } 
+ }
+
+byte getterBTN1(void) {
+ if (LastButton_state1 == 0) { // if button is pressed
+    return 0xff;              // return "Triggered" state to the controller
+  } else {                    // if button is released
+    return 0;                 // return "Idle" state to the controller
+  }
+}
+  
+byte getterBTN2(void) {
+ if (LastButton_state2 == 0) { // if button is pressed
+    return 0xff;              // return "Triggered" state to the controller
+  } else {                    // if button is released
+    return 0;                 // return "Idle" state to the controller
+  }
+}
+  
